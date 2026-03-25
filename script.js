@@ -104,6 +104,20 @@ let matchedPairs = 0;
 const totalPairs = 9; // 9 icons, 2 of each = 9 pairs
 const memoryIcons = ["🐒", "🦜", "🌳", "🔥", "🍌", "🌿", "🐛", "🌞", "🍄"];
 
+// Decorações por pergunta
+const questionDecorations = [
+    ["🔥", "🚒", "🌳", "💨"], // P1: Queimadas
+    ["🚬", "🚗", "🛣️", "🔥"], // P2: Bitucas
+    ["🍂", "☀️", "🌥️", "🏜️"], // P3: Época
+    ["🐒", "🦜", "🐆", "🐢"], // P4: Animais
+    ["👨‍🚒", "🚒", "📞", "🚨"], // P5: Bombeiros
+    ["😷", "🏥", "☁️", "🏭"], // P6: Fumaça
+    ["🍂", "🐜", "🪵", "🌱"], // P7: Serrapilheira
+    ["🌍", "🌡️", "☀️", "🌊"], // P8: Clima
+    ["🧱", "🏜️", "🌾", "⛏️"], // P9: Solo
+    ["💧", "🚫", "🏜️", "🌊"]  // P10: Hidrofobia
+];
+
 // Configurar Background Premium
 const bgElement = document.getElementById('background');
 bgElement.style.backgroundImage = "url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')";
@@ -175,6 +189,22 @@ function showQuestion() {
     container.style.animation = 'none';
     container.offsetHeight;
     container.style.animation = 'fadeIn 0.5s ease-out';
+
+    // Atualizar Decorações
+    updateDecorations();
+}
+
+function updateDecorations() {
+    const decors = questionDecorations[currentQuestion];
+    const corners = document.querySelectorAll('.corner');
+
+    corners.forEach((corner, i) => {
+        corner.style.opacity = '0';
+        setTimeout(() => {
+            corner.innerText = decors[i];
+            corner.style.opacity = '1';
+        }, 150);
+    });
 }
 
 function selectOption(index, element) {
