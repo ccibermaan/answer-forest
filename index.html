@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardião da Floresta: O Desafio de 10 Mil</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Botão de Música */
+        #music-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        #music-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <audio id="bg-music" loop>
+        <source src="https://archive.org/download/minecraft-volume-beta/Minecraft%20Volume%20Beta/13.%20Aria%20Math.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="music-btn" onclick="toggleMusic()">
+        <span id="music-icon">🎵</span>
+    </div>
+
+    <div id="background"></div>
+    <div id="background-overlay"></div>
+
+    <main class="container">
+        <!-- Tela de Início -->
+        <section id="start-screen">
+            <h1>Guardião da Floresta</h1>
+            <p id="start-description" class="description">Responda 10 perguntas cruciais sobre nosso ecossistema, ganhe R$ 1.000 por acerto e teste se você é um verdadeiro protetor da natureza!</p>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="lang-select" style="display: block; margin-bottom: 10px; font-weight: 600;">Idioma / Language:</label>
+                <select id="lang-select" onchange="changeLanguage()" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); padding: 10px; border-radius: 8px; font-family: var(--primary-font);">
+                    <option value="pt">Português</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <button id="start-btn" class="btn-primary" onclick="startGame()">Iniciar Desafio</button>
+        </section>
+
+        <!-- Tela de Jogo (HUD + Perguntas) -->
+        <section id="game-screen" style="display: none;">
+            <div class="hud">
+                <span id="question-count">Pergunta: 1/10</span>
+                <span class="reward">Acumulado: <span id="reward-value">R$ 0</span></span>
+            </div>
+            
+            <div class="question-container">
+                <h2 id="question-text" class="question-text">Carregando pergunta...</h2>
+                <div id="options-grid" class="options-grid">
+                    <!-- Alternativas serão inseridas via JS -->
+                </div>
+            </div>
+
+            <button id="next-btn" class="btn-primary" onclick="nextQuestion()">Próxima Pergunta</button>
+        </section>
+
+        <!-- Tela de Bônus: Forca -->
+        <section id="hangman-screen" style="display: none;">
+            <h1>Desafio Extra: Forca</h1>
+            <p>Descubra a palavra relacionada ao meio ambiente para avançar!</p>
+            
+            <div class="hangman-gfx">
+                <svg viewBox="0 0 100 100">
+                    <line x1="10" y1="95" x2="90" y2="95" stroke="white" stroke-width="4"/>
+                    <line x1="30" y1="95" x2="30" y2="10" stroke="white" stroke-width="4"/>
+                    <line x1="30" y1="10" x2="70" y2="10" stroke="white" stroke-width="4"/>
+                    <line x1="70" y1="10" x2="70" y2="25" stroke="white" stroke-width="4"/>
+                    <circle cx="70" cy="35" r="10" class="hangman-part" id="part-0"/>
+                    <line x1="70" y1="45" x2="70" y2="70" class="hangman-part" id="part-1"/>
+                    <line x1="70" y1="50" x2="50" y2="60" class="hangman-part" id="part-2"/>
+                    <line x1="70" y1="50" x2="90" y2="60" class="hangman-part" id="part-3"/>
+                    <line x1="70" y1="70" x2="50" y2="85" class="hangman-part" id="part-4"/>
+                    <line x1="70" y1="70" x2="90" y2="85" class="hangman-part" id="part-5"/>
+                </svg>
+            </div>
+
+            <div id="word-display" class="word-display">_ _ _ _ _</div>
+            <div id="keyboard" class="keyboard"></div>
+            <p id="hangman-msg"></p>
+            
+            <button id="hangman-next-btn" class="btn-primary" style="display: none; margin-top: 20px;" onclick="nextHangmanOrMemory()">Próximo Passo</button>
+        </section>
+
+        <!-- Tela de Bônus: Memória -->
+        <section id="memory-screen" style="display: none;">
+            <h1 id="memory-title">Desafio de Memória</h1>
+            <p id="memory-desc">Encontre os pares para ganhar R$ 1.000 por acerto!</p>
+            
+            <div id="memory-grid" class="memory-grid">
+                <!-- Cartas inseridas via JS -->
+            </div>
+
+            <button id="memory-next-btn" class="btn-primary" style="display: none; margin-top: 20px;" onclick="showEndScreen()">Ver Resultado Final</button>
+        </section>
+
+        <!-- Tela de Resultado -->
+        <section id="result-screen" style="display: none;">
+            <h1>Desafio Concluído!</h1>
+            <div class="result-value" id="final-reward">R$ 0</div>
+            <p class="description" id="result-message">Mensagem de desempenho...</p>
+            <button class="btn-primary" onclick="restartGame()">Jogar Novamente</button>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
