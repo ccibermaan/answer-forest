@@ -17,6 +17,7 @@ const translations = {
         memoryNext: "Ver Resultado Final",
         resultTitle: "Desafio Concluído!",
         restartBtn: "Jogar Novamente",
+        gameOverTitle: "Fim de Jogo!",
         messages: [
             "Precisa aprender mais sobre o ambiente. A natureza clama por ajuda, e o primeiro passo é o conhecimento. Não desista!",
             "Você sabe o básico sobre a mãe natureza! Bom trabalho, mas ainda há espaço para crescer e proteger nossas florestas.",
@@ -58,6 +59,7 @@ const translations = {
         memoryNext: "See Final Result",
         resultTitle: "Challenge Completed!",
         restartBtn: "Play Again",
+        gameOverTitle: "Game Over!",
         messages: [
             "You need to learn more about the environment. Nature cries for help, and knowledge is the first step. Don't give up!",
             "You know the basics about Mother Nature! Good job, but there's still room to grow and protect our forests.",
@@ -135,7 +137,7 @@ function toggleMusic() {
 function startGame() {
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
-    
+
     // Iniciar Música (Requisito de Interação do Navegador)
     if (!musicPlaying) {
         bgMusic.play().then(() => {
@@ -143,7 +145,7 @@ function startGame() {
             document.getElementById('music-icon').innerText = "🎵";
         }).catch(e => console.log("Erro ao tocar música: ", e));
     }
-    
+
     showQuestion();
 }
 
@@ -151,11 +153,11 @@ function showQuestion() {
     answered = false;
     const t = translations[lang];
     const qData = t.questions[currentQuestion];
-    
+
     document.getElementById('question-count').innerText = `${t.hudQuestion}: ${currentQuestion + 1}/10`;
     document.getElementById('reward-value').innerText = `R$ ${(score * 1000) + rewardFromMatch}`;
     document.getElementById('question-text').innerText = qData.q;
-    
+
     const optionsGrid = document.getElementById('options-grid');
     optionsGrid.innerHTML = '';
     document.getElementById('next-btn').style.display = 'none';
@@ -171,7 +173,7 @@ function showQuestion() {
 
     const container = document.querySelector('.container');
     container.style.animation = 'none';
-    container.offsetHeight; 
+    container.offsetHeight;
     container.style.animation = 'fadeIn 0.5s ease-out';
 }
 
@@ -180,7 +182,7 @@ function selectOption(index, element) {
     answered = true;
     const t = translations[lang];
     const correct = t.questions[currentQuestion].correct;
-    
+
     document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
     element.classList.add('selected');
 
@@ -210,31 +212,31 @@ function nextQuestion() {
 function startHangman() {
     document.getElementById('game-screen').style.display = 'none';
     document.getElementById('hangman-screen').style.display = 'block';
-    
+
     const t = translations[lang];
     const wordList = t.hangman[currentHangmanRound];
     selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
     guessedLetters = [];
     mistakes = 0;
-    
+
     document.querySelector('#hangman-screen h1').innerText = t.hangmanTitle.replace('{r}', currentHangmanRound + 1);
     document.querySelector('#hangman-screen p').innerText = t.hangmanDesc;
-    
+
     updateHangmanDisplay();
     createKeyboard();
-    
+
     document.querySelectorAll('.hangman-part').forEach(part => part.style.display = 'none');
     document.getElementById('hangman-msg').innerText = "";
     document.getElementById('hangman-next-btn').style.display = 'none';
 }
 
 function updateHangmanDisplay() {
-    const display = selectedWord.split('').map(letter => 
+    const display = selectedWord.split('').map(letter =>
         guessedLetters.includes(letter) ? letter : "_"
     ).join(' ');
-    
+
     document.getElementById('word-display').innerText = display;
-    
+
     if (!display.includes("_")) {
         endHangman(true);
     }
@@ -244,7 +246,7 @@ function createKeyboard() {
     const keyboard = document.getElementById('keyboard');
     keyboard.innerHTML = '';
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    
+
     letters.split('').forEach(letter => {
         const key = document.createElement('div');
         key.className = 'key';
@@ -256,10 +258,10 @@ function createKeyboard() {
 
 function handleGuess(letter, element) {
     if (guessedLetters.includes(letter) || mistakes >= maxMistakes) return;
-    
+
     guessedLetters.push(letter);
     element.classList.add('disabled');
-    
+
     if (selectedWord.includes(letter)) {
         element.classList.add('correct-key');
         updateHangmanDisplay();
@@ -286,10 +288,10 @@ function endHangman(won) {
         msg.style.color = "var(--error-color)";
         document.getElementById('word-display').innerText = selectedWord.split('').join(' ');
     }
-    
+
     document.querySelectorAll('.key').forEach(key => key.classList.add('disabled'));
     nextBtn.style.display = 'block';
-    
+
     if (currentHangmanRound < totalHangmanRounds - 1) {
         nextBtn.innerText = t.hangmanNext;
         nextBtn.onclick = () => {
@@ -300,23 +302,28 @@ function endHangman(won) {
         nextBtn.innerText = t.hangmanFinal;
         nextBtn.onclick = startMemoryGame;
     }
+
+    if (!won) {
+        // If they lost the hangman, we show the "Game Over" screen after a short delay
+        setTimeout(() => showEndScreen(true), 2000);
+    }
 }
 
 // --- JOGO DA MEMÓRIA ---
 function startMemoryGame() {
     document.getElementById('hangman-screen').style.display = 'none';
     document.getElementById('memory-screen').style.display = 'block';
-    
+
     const t = translations[lang];
     document.getElementById('memory-title').innerText = t.memoryTitle;
     document.getElementById('memory-desc').innerText = t.memoryDesc;
     document.getElementById('memory-next-btn').innerText = t.memoryNext;
     document.getElementById('memory-next-btn').onclick = showEndScreen;
     document.getElementById('memory-next-btn').style.display = 'none';
-    
+
     matchedPairs = 0;
     flippedCards = [];
-    
+
     // Criar os 18 pares (36 cartas) usando os 9 ícones (2 de cada ícone)
     memoryCards = [];
     memoryIcons.forEach(icon => {
@@ -332,10 +339,10 @@ function startMemoryGame() {
 
     // Embaralhar
     memoryCards.sort(() => Math.random() - 0.5);
-    
+
     const grid = document.getElementById('memory-grid');
     grid.innerHTML = '';
-    
+
     memoryCards.forEach((icon, index) => {
         const card = document.createElement('div');
         card.className = 'memory-card';
@@ -354,7 +361,7 @@ function flipCard(card, icon) {
     if (flippedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
         card.classList.add('flipped');
         flippedCards.push({ card, icon });
-        
+
         if (flippedCards.length === 2) {
             setTimeout(checkMatch, 800);
         }
@@ -363,7 +370,7 @@ function flipCard(card, icon) {
 
 function checkMatch() {
     const [card1, card2] = flippedCards;
-    
+
     if (card1.icon === card2.icon) {
         card1.card.classList.add('matched');
         card2.card.classList.add('matched');
@@ -375,25 +382,34 @@ function checkMatch() {
         card1.card.classList.remove('flipped');
         card2.card.classList.remove('flipped');
     }
-    
+
     flippedCards = [];
-    
+
     if (matchedPairs === memoryCards.length / 2) { // All pairs matched
         document.getElementById('memory-next-btn').style.display = 'block';
     }
 }
 
-function showEndScreen() {
+function showEndScreen(isGameOver = false) {
     const t = translations[lang];
+    document.getElementById('hangman-screen').style.display = 'none';
     document.getElementById('memory-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
-    
-    document.querySelector('#result-screen h1').innerText = t.resultTitle;
+
+    const titleElement = document.querySelector('#result-screen h1');
+    titleElement.innerText = isGameOver ? t.gameOverTitle : t.resultTitle;
+
+    if (isGameOver) {
+        titleElement.style.color = "var(--error-color)";
+    } else {
+        titleElement.style.color = "var(--text-white)";
+    }
+
     document.querySelector('#result-screen .btn-primary').innerText = t.restartBtn;
 
     const finalValue = (score * 1000) + rewardFromMatch;
     document.getElementById('final-reward').innerText = `R$ ${finalValue}`;
-    
+
     let msgIndex = score <= 4 ? 0 : (score <= 7 ? 1 : 2);
     document.getElementById('result-message').innerText = t.messages[msgIndex];
 }
